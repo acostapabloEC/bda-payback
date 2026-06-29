@@ -92,13 +92,6 @@ export default function App() {
   const BDA_MONTH_PC = remoteData?.BDA_MONTH_PC ?? [];
   const SBC_MONTH_PC = remoteData?.SBC_MONTH_PC ?? [];
 
-  if (dataLoading) return (
-    <div style={{ background:"#0a0f1e", minHeight:"100vh", display:"flex",
-      alignItems:"center", justifyContent:"center", color:"#aaa", fontSize:14 }}>
-      Loading dashboard dataâ€¦
-    </div>
-  );
-
   const [universe,   setUniverse]   = useState("bda");
   const [xAxis,      setXAxis]      = useState("date");
   const [aiFilter,   setAiFilter]   = useState("all");
@@ -235,6 +228,13 @@ export default function App() {
     }
     return arr.slice(0, pcData.length);
   }, [rawCCost, pcData, xAxis, dateStart, dateEnd]);
+
+  if (dataLoading) return (
+    <div style={{ background:"#0a0f1e", minHeight:"100vh", display:"flex",
+      alignItems:"center", justifyContent:"center", color:"#aaa", fontSize:14 }}>
+      Loading dashboard data…
+    </div>
+  );
 
   return (
     <PasswordGate>
