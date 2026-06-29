@@ -1,16 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+﻿import { useState, useMemo, useEffect } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ReferenceLine, ResponsiveContainer, ReferenceArea
 } from "recharts";
-import {
-  BDA_REPS, SBC_REPS, BDA_KNOWN_REPS, SBC_KNOWN_REPS,
-  BDA_ACTIVE, BDA_INACTIVE, SBC_ACTIVE, SBC_INACTIVE,
-  BDA_DATE_PC, BDA_DATE_RPR, BDA_DATE_CCOST,
-  BDA_MONTH_PC, BDA_MONTH_RPR, BDA_MONTH_CCOST,
-  SBC_DATE_PC, SBC_DATE_RPR, SBC_DATE_CCOST,
-  SBC_MONTH_PC, SBC_MONTH_RPR, SBC_MONTH_CCOST,
-} from "./data.js";
+import { DATA_URL } from "./data.js";
 
 const PASSWORD = "john2026";
 
@@ -18,8 +11,8 @@ const BDA_COLORS = ["#2196F3","#4CAF50","#FF9800","#E91E63","#9C27B0","#00BCD4",
 const SBC_COLORS = ["#FF6B6B","#4ECDC4","#45B7D1","#96CEB4","#FFEAA7","#DDA0DD","#98D8C8","#F7DC6F","#BB8FCE","#85C1E9"];
 
 const lastName = name => name.split(" ").slice(-1)[0];
-const fmt$  = v => v == null ? "—" : `$${v >= 0 ? "" : "-"}${Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-const fmtPC = v => v == null ? "—" : v.toFixed(2) + "x";
+const fmt$  = v => v == null ? "â€”" : `$${v >= 0 ? "" : "-"}${Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+const fmtPC = v => v == null ? "â€”" : v.toFixed(2) + "x";
 
 const CustomTooltip = ({ active, payload, label, xAxis }) => {
   if (!active || !payload?.length) return null;
@@ -67,6 +60,45 @@ function PasswordGate({ children }) {
 }
 
 export default function App() {
+
+  // â”€â”€ Remote data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const [remoteData, setRemoteData] = useState(null);
+  const [dataLoading, setDataLoading] = useState(true);
+  useEffect(() => {
+    fetch(DATA_URL)
+      .then(r => r.json())
+      .then(d => { setRemoteData(d); setDataLoading(false); })
+      .catch(() => setDataLoading(false));
+  }, []);
+
+  const BDA_REPS = remoteData?.BDA_REPS ?? [];
+  const SBC_REPS = remoteData?.SBC_REPS ?? [];
+  const BDA_KNOWN_REPS = remoteData?.BDA_KNOWN_REPS ?? [];
+  const SBC_KNOWN_REPS = remoteData?.SBC_KNOWN_REPS ?? [];
+  const BDA_ACTIVE = remoteData?.BDA_ACTIVE ?? [];
+  const BDA_INACTIVE = remoteData?.BDA_INACTIVE ?? [];
+  const SBC_ACTIVE = remoteData?.SBC_ACTIVE ?? [];
+  const SBC_INACTIVE = remoteData?.SBC_INACTIVE ?? [];
+  const BDA_DATE_RPR = remoteData?.BDA_DATE_RPR ?? [];
+  const SBC_DATE_RPR = remoteData?.SBC_DATE_RPR ?? [];
+  const BDA_MONTH_RPR = remoteData?.BDA_MONTH_RPR ?? [];
+  const SBC_MONTH_RPR = remoteData?.SBC_MONTH_RPR ?? [];
+  const BDA_DATE_CCOST = remoteData?.BDA_DATE_CCOST ?? [];
+  const SBC_DATE_CCOST = remoteData?.SBC_DATE_CCOST ?? [];
+  const BDA_MONTH_CCOST = remoteData?.BDA_MONTH_CCOST ?? [];
+  const SBC_MONTH_CCOST = remoteData?.SBC_MONTH_CCOST ?? [];
+  const BDA_DATE_PC = remoteData?.BDA_DATE_PC ?? [];
+  const SBC_DATE_PC = remoteData?.SBC_DATE_PC ?? [];
+  const BDA_MONTH_PC = remoteData?.BDA_MONTH_PC ?? [];
+  const SBC_MONTH_PC = remoteData?.SBC_MONTH_PC ?? [];
+
+  if (dataLoading) return (
+    <div style={{ background:"#0a0f1e", minHeight:"100vh", display:"flex",
+      alignItems:"center", justifyContent:"center", color:"#aaa", fontSize:14 }}>
+      Loading dashboard dataâ€¦
+    </div>
+  );
+
   const [universe,   setUniverse]   = useState("bda");
   const [xAxis,      setXAxis]      = useState("date");
   const [aiFilter,   setAiFilter]   = useState("all");
@@ -213,9 +245,9 @@ export default function App() {
         <div style={{ display:"flex", alignItems:"baseline", gap:16, marginBottom:4 }}>
           <h1 style={{ margin:0, fontSize:22, fontWeight:700, letterSpacing:0.5 }}>GROSS PAYBACK</h1>
           <span style={{ color:"#888", fontSize:13 }}>
-            {universe.toUpperCase()} · {aiFilter === "all" ? "All" : aiFilter.charAt(0).toUpperCase()+aiFilter.slice(1)}
-            {" — "}{xAxis === "date" ? `${dateStart || "Jan-22"} → ${dateEnd || "Present"}` : "First 24 Months"}
-            <span style={{ color:"#555", marginLeft:12 }}>Gross · Direct costs only (salary + commissions + tax)</span>
+            {universe.toUpperCase()} Â· {aiFilter === "all" ? "All" : aiFilter.charAt(0).toUpperCase()+aiFilter.slice(1)}
+            {" â€” "}{xAxis === "date" ? `${dateStart || "Jan-22"} â†’ ${dateEnd || "Present"}` : "First 24 Months"}
+            <span style={{ color:"#555", marginLeft:12 }}>Gross Â· Direct costs only (salary + commissions + tax)</span>
           </span>
         </div>
 
@@ -264,9 +296,9 @@ export default function App() {
         {/* Chart */}
         <div style={{ background:"#111827", borderRadius:8, padding:"16px 8px 8px", marginBottom:20 }}>
           <div style={{ color:"#aaa", fontSize:11, paddingLeft:16, marginBottom:8 }}>
-            P+/-C = RPr ÷ |Total Direct Cost|. &nbsp;
+            P+/-C = RPr Ã· |Total Direct Cost|. &nbsp;
             <span style={{ color:"#4CAF50" }}>Above 1.0x = cost recovered (payback zone)</span>
-            &nbsp;·&nbsp;
+            &nbsp;Â·&nbsp;
             <span style={{ color:"#E91E63" }}>Below 1.0x = underwater</span>
           </div>
           <ResponsiveContainer width="100%" height={440}>
@@ -281,7 +313,7 @@ export default function App() {
               <YAxis tickFormatter={yFmt} tick={{ fill:"#666", fontSize:11 }}
                 axisLine={{ stroke:"#1e2d4a" }} tickLine={false} width={52} />
               <Tooltip content={<CustomTooltip xAxis={xAxis} />} />
-              {/* Breakeven line — label above */}
+              {/* Breakeven line â€” label above */}
               <ReferenceLine y={1.0} stroke="#FFD700" strokeWidth={1.5} strokeDasharray="5 3"
                 label={{ value:"Breakeven 1.0x", fill:"#FFD700", fontSize:10, position:"insideTopLeft" }} />
               <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
@@ -318,11 +350,11 @@ export default function App() {
           })}
         </div>
 
-        {/* Horizontal table — RPr and C.Cost per period */}
+        {/* Horizontal table â€” RPr and C.Cost per period */}
         {selectedReps.length > 0 && (
           <div style={{ background:"#111827", borderRadius:8, overflow:"hidden", marginBottom:20 }}>
             <div style={{ padding:"10px 16px", borderBottom:"1px solid #1e2d4a", fontSize:12, color:"#aaa", fontWeight:600 }}>
-              RPr & C.Cost by {xAxis === "month" ? "Tenure Month" : "Calendar Period"} — Selected Reps
+              RPr & C.Cost by {xAxis === "month" ? "Tenure Month" : "Calendar Period"} â€” Selected Reps
             </div>
             <div style={{ overflowX:"auto" }}>
               <table style={{ borderCollapse:"collapse", fontSize:12, whiteSpace:"nowrap", minWidth:"100%" }}>
@@ -367,7 +399,7 @@ export default function App() {
                               <td key={row[xKey]} style={{ padding:"7px 12px", textAlign:"right",
                                 fontWeight: val != null ? 600 : 400,
                                 color: val == null ? "#2a3a55" : isPos ? "#4CAF50" : "#E91E63" }}>
-                                {val == null ? "—" : fmt$(val)}
+                                {val == null ? "â€”" : fmt$(val)}
                               </td>
                             );
                           })}
@@ -385,7 +417,7 @@ export default function App() {
                               <td key={row[xKey]} style={{ padding:"7px 12px", textAlign:"right",
                                 fontWeight: val != null ? 500 : 400,
                                 color: val == null ? "#2a3a55" : "#E91E63" }}>
-                                {val == null ? "—" : fmt$(val)}
+                                {val == null ? "â€”" : fmt$(val)}
                               </td>
                             );
                           })}
