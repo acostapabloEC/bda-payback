@@ -1,18 +1,18 @@
-﻿import { useState, useMemo, useEffect } from "react";
+﻿import { useState, useMemo, useEffect, Fragment } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ReferenceLine, ResponsiveContainer, ReferenceArea
 } from "recharts";
 import { DATA_URL } from "./data.js";
 
-const PASSWORD = "john2026";
+const PASSWORD = "Elite2026";
 
-const BDA_COLORS = ["#2196F3","#4CAF50","#FF9800","#E91E63","#9C27B0","#00BCD4","#FF5722","#8BC34A","#FFC107","#607D8B","#F44336","#3F51B5","#009688","#CDDC39","#FF4081","#00E5FF","#76FF03","#FF6D00","#D500F9","#00B0FF","#64FFDA","#EEFF41","#FF6E40","#40C4FF","#EA80FC","#A7FFEB","#FFD740","#FF6D00","#69F0AE","#B0BEC5","#EF9A9A","#CE93D8","#80CBC4","#A5D6A7","#FFE082","#90CAF9"];
-const SBC_COLORS = ["#FF6B6B","#4ECDC4","#45B7D1","#96CEB4","#FFEAA7","#DDA0DD","#98D8C8","#F7DC6F","#BB8FCE","#85C1E9"];
+const BDA_COLORS = ["#e47058","#3fd583","#ce6cef","#dee458","#3fa3d5","#ef6c9d","#64e458","#5e3fd5","#efae6c","#58e4c7","#d53fc8","#beef6c","#5887e4","#d53f45","#6cef8d","#a458e4","#d5bc3f","#6cdeef","#e458a9","#6ad53f","#6c6cef","#e48158","#3fd597","#df6cef","#cce458","#3f8fd5","#ef6c8c","#58e45f","#713fd5","#efbe6c","#58e4d9","#d53fb5","#adef6c","#5875e4","#d54c3f","#6cef9e","#b658e4","#d5cf3f","#6ccdef","#e45898","#57d53f","#7d6cef"];
+const SBC_COLORS = ["#52b1e0","#d03972","#70ec65","#6f52e0","#d08539","#65ecd0","#e052d4","#97d039","#6592ec","#e05257","#39d05f","#ae65ec","#e0c952","#39bdd0"];
 
 const lastName = name => name.split(" ").slice(-1)[0];
-const fmt$  = v => v == null ? "â€”" : `$${v >= 0 ? "" : "-"}${Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-const fmtPC = v => v == null ? "â€”" : v.toFixed(2) + "x";
+const fmt$  = v => v == null ? "—" : `$${v >= 0 ? "" : "-"}${Math.abs(v).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+const fmtPC = v => v == null ? "—" : v.toFixed(2) + "x";
 
 const CustomTooltip = ({ active, payload, label, xAxis }) => {
   if (!active || !payload?.length) return null;
@@ -61,7 +61,7 @@ function PasswordGate({ children }) {
 
 export default function App() {
 
-  // â”€â”€ Remote data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Remote data ────────────────────────────────────────────────────────────
   const [remoteData, setRemoteData] = useState(null);
   const [dataLoading, setDataLoading] = useState(true);
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function App() {
     setActiveReps(new Set(pool));
     setDateStart(null);
     setDateEnd(null);
-  }, [universe, aiFilter]);
+  }, [universe, aiFilter, remoteData]);
 
   const allReps      = universe === "bda" ? BDA_REPS      : SBC_REPS;
   const knownReps    = universe === "bda" ? BDA_KNOWN_REPS: SBC_KNOWN_REPS;
@@ -125,21 +125,21 @@ export default function App() {
     if (universe === "bda" && xAxis === "month") return BDA_MONTH_PC;
     if (universe === "sbc" && xAxis === "date")  return SBC_DATE_PC;
     return SBC_MONTH_PC;
-  }, [universe, xAxis]);
+  }, [universe, xAxis, remoteData]);
 
   const rawRPr = useMemo(() => {
     if (universe === "bda" && xAxis === "date")  return BDA_DATE_RPR;
     if (universe === "bda" && xAxis === "month") return BDA_MONTH_RPR;
     if (universe === "sbc" && xAxis === "date")  return SBC_DATE_RPR;
     return SBC_MONTH_RPR;
-  }, [universe, xAxis]);
+  }, [universe, xAxis, remoteData]);
 
   const rawCCost = useMemo(() => {
     if (universe === "bda" && xAxis === "date")  return BDA_DATE_CCOST;
     if (universe === "bda" && xAxis === "month") return BDA_MONTH_CCOST;
     if (universe === "sbc" && xAxis === "date")  return SBC_DATE_CCOST;
     return SBC_MONTH_CCOST;
-  }, [universe, xAxis]);
+  }, [universe, xAxis, remoteData]);
 
   const xKey = xAxis === "date" ? "date" : "month";
 
@@ -245,9 +245,9 @@ export default function App() {
         <div style={{ display:"flex", alignItems:"baseline", gap:16, marginBottom:4 }}>
           <h1 style={{ margin:0, fontSize:22, fontWeight:700, letterSpacing:0.5 }}>GROSS PAYBACK</h1>
           <span style={{ color:"#888", fontSize:13 }}>
-            {universe.toUpperCase()} Â· {aiFilter === "all" ? "All" : aiFilter.charAt(0).toUpperCase()+aiFilter.slice(1)}
-            {" â€” "}{xAxis === "date" ? `${dateStart || "Jan-22"} â†’ ${dateEnd || "Present"}` : "First 24 Months"}
-            <span style={{ color:"#555", marginLeft:12 }}>Gross Â· Direct costs only (salary + commissions + tax)</span>
+            {universe.toUpperCase()} · {aiFilter === "all" ? "All" : aiFilter.charAt(0).toUpperCase()+aiFilter.slice(1)}
+            {" — "}{xAxis === "date" ? `${dateStart || "Jan-22"} → ${dateEnd || "Present"}` : "By tenure month"}
+            <span style={{ color:"#555", marginLeft:12 }}>Gross · Direct costs only (salary + commissions + tax)</span>
           </span>
         </div>
 
@@ -266,7 +266,7 @@ export default function App() {
           </div>
           <div style={{ display:"flex", gap:4 }}>
             <button onClick={() => setXAxis("date")}  style={{...btn(xAxis==="date")}}>Calendar Date</button>
-            <button onClick={() => setXAxis("month")} style={{...btn(xAxis==="month")}}>First 24 Months</button>
+            <button onClick={() => setXAxis("month")} style={{...btn(xAxis==="month")}}>By Tenure Month</button>
           </div>
           {xAxis === "date" && (
             <div style={{ display:"flex", gap:8, alignItems:"center", marginLeft:4 }}>
@@ -296,11 +296,20 @@ export default function App() {
         {/* Chart */}
         <div style={{ background:"#111827", borderRadius:8, padding:"16px 8px 8px", marginBottom:20 }}>
           <div style={{ color:"#aaa", fontSize:11, paddingLeft:16, marginBottom:8 }}>
-            P+/-C = RPr Ã· |Total Direct Cost|. &nbsp;
+            P+/-C = RPr ÷ |Total Direct Cost|. &nbsp;
             <span style={{ color:"#4CAF50" }}>Above 1.0x = cost recovered (payback zone)</span>
-            &nbsp;Â·&nbsp;
+            &nbsp;·&nbsp;
             <span style={{ color:"#E91E63" }}>Below 1.0x = underwater</span>
           </div>
+          {selectedReps.length === 0 ? (
+            <div style={{ height:440, display:"flex", alignItems:"center", justifyContent:"center", color:"#607D8B", fontSize:13 }}>
+              No reps selected — pick at least one below to plot.
+            </div>
+          ) : pcData.length === 0 ? (
+            <div style={{ height:440, display:"flex", alignItems:"center", justifyContent:"center", color:"#607D8B", fontSize:13 }}>
+              No data in the selected date range — adjust From / To or Reset.
+            </div>
+          ) : (
           <ResponsiveContainer width="100%" height={440}>
             <LineChart data={pcData} margin={{ top:8, right:150, left:10, bottom:4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e2d4a" />
@@ -313,7 +322,7 @@ export default function App() {
               <YAxis tickFormatter={yFmt} tick={{ fill:"#666", fontSize:11 }}
                 axisLine={{ stroke:"#1e2d4a" }} tickLine={false} width={52} />
               <Tooltip content={<CustomTooltip xAxis={xAxis} />} />
-              {/* Breakeven line â€” label above */}
+              {/* Breakeven line — label above */}
               <ReferenceLine y={1.0} stroke="#FFD700" strokeWidth={1.5} strokeDasharray="5 3"
                 label={{ value:"Breakeven 1.0x", fill:"#FFD700", fontSize:10, position:"insideTopLeft" }} />
               <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
@@ -323,6 +332,7 @@ export default function App() {
               ))}
             </LineChart>
           </ResponsiveContainer>
+          )}
         </div>
 
         {/* Rep chips */}
@@ -350,11 +360,11 @@ export default function App() {
           })}
         </div>
 
-        {/* Horizontal table â€” RPr and C.Cost per period */}
+        {/* Horizontal table — RPr and C.Cost per period */}
         {selectedReps.length > 0 && (
           <div style={{ background:"#111827", borderRadius:8, overflow:"hidden", marginBottom:20 }}>
             <div style={{ padding:"10px 16px", borderBottom:"1px solid #1e2d4a", fontSize:12, color:"#aaa", fontWeight:600 }}>
-              RPr & C.Cost by {xAxis === "month" ? "Tenure Month" : "Calendar Period"} â€” Selected Reps
+              RPr & C.Cost by {xAxis === "month" ? "Tenure Month" : "Calendar Period"} — Selected Reps
             </div>
             <div style={{ overflowX:"auto" }}>
               <table style={{ borderCollapse:"collapse", fontSize:12, whiteSpace:"nowrap", minWidth:"100%" }}>
@@ -379,7 +389,7 @@ export default function App() {
                     const c   = colorMap[rep];
                     const bg0 = i % 2 === 0 ? "#111827" : "#0d1829";
                     return (
-                      <>
+                      <Fragment key={rep}>
                         {/* RPr row */}
                         <tr key={`${rep}-rpr`} style={{ borderTop:"1px solid #1e2d4a", background: bg0 }}>
                           <td style={{ padding:"7px 14px", position:"sticky", left:0, zIndex:1,
@@ -399,7 +409,7 @@ export default function App() {
                               <td key={row[xKey]} style={{ padding:"7px 12px", textAlign:"right",
                                 fontWeight: val != null ? 600 : 400,
                                 color: val == null ? "#2a3a55" : isPos ? "#4CAF50" : "#E91E63" }}>
-                                {val == null ? "â€”" : fmt$(val)}
+                                {val == null ? "—" : fmt$(val)}
                               </td>
                             );
                           })}
@@ -417,12 +427,12 @@ export default function App() {
                               <td key={row[xKey]} style={{ padding:"7px 12px", textAlign:"right",
                                 fontWeight: val != null ? 500 : 400,
                                 color: val == null ? "#2a3a55" : "#E91E63" }}>
-                                {val == null ? "â€”" : fmt$(val)}
+                                {val == null ? "—" : fmt$(val)}
                               </td>
                             );
                           })}
                         </tr>
-                      </>
+                      </Fragment>
                     );
                   })}
                 </tbody>
@@ -435,3 +445,4 @@ export default function App() {
     </PasswordGate>
   );
 }
+
